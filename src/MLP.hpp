@@ -20,19 +20,21 @@ namespace s21
 	class MLP
 	{
 	private:
-		std::vector<std::vector<double>> _input;
+		std::vector<std::vector<double>>	_input;
 
 		int 											_layersNb;
-		std::vector<std::vector<double>> 				_sigmoidRes;
+		std::vector<std::vector<double>> 				_neurons;
 		std::vector<std::vector<std::vector<double>>> 	_weights;
 
 	public:
 		void 	initMatrix(int _layersNb);
+		void 	genWeights();
+		void 	fillInputNeurons();
 		void 	fileToInput(const std::string &fileName);
 		void	exitError(const std::string &massage);
 
-		double	sigmoid(double a) { return 2/(1 + exp(-a)) - 1; }
-		double	df_sig(double a){ return 0.5*(1 + a)*(1 - a); }
+		static double	sigmoid(double a) { return 2/(1 + exp(-a)) - 1; }
+		static double	df_sig(double a){ return 0.5*(1 + a)*(1 - a); }
 		void 	predict();
 		void	backpropagation();
 

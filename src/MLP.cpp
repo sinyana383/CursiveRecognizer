@@ -2,37 +2,56 @@
 
 void s21::MLP::initMatrix(int layersNb)
 {
+	// set size to _weights and _sigmoidRes
     _layersNb = layersNb;
-    _sigmoidRes.resize(_layersNb - 1);
-    _weights.resize(_layersNb - 1);
+    _neurons.resize(_layersNb);
+    _weights.resize(_layersNb);
+	_neurons[0].resize(inNeuronsNb);
+	_weights[0].resize(0);
 
-    // set size to _weights and _sigmoidRes
-    for (int i = 0; i < _layersNb - 2; ++i)
+    for (int i = 1; i < _layersNb - 1; ++i)
     {
-        _sigmoidRes[i].resize(hiddenNeuronsNb);
+        _neurons[i].resize(hiddenNeuronsNb);
         _weights[i].resize(hiddenNeuronsNb);
         for (int j = 0; j < hiddenNeuronsNb; ++j)
         {
-            if (i == 0)
+            if (i == 1)
                 _weights[i][j].resize(inNeuronsNb);
             else
                 _weights[i][j].resize(hiddenNeuronsNb);
         }
     }
 
-    // init weights
-    srand(time(nullptr));
-    for (int i = 0; i < _weights.size(); ++i)
-    {
-        for (int j = 0; j < _weights[i].size(); ++j)
-        {
-            for (int w = 0; w < _weights[i][j].size(); ++w)
-                _weights[i][j][w] = rand() % 1000 * 0.001;
-        }
-    }
+	_neurons[_layersNb - 1].resize(outNeuronsNb);
+	_weights[_layersNb - 1].resize(outNeuronsNb);
+	for (int j = 0; j < outNeuronsNb; ++j)
+		_weights[_layersNb - 1][j].resize(hiddenNeuronsNb);
 
-    _sigmoidRes[_layersNb - 2].resize(outNeuronsNb);
-    _weights[_layersNb - 2].resize()    // че делать
+	// init weights and neurons
+	genWeights();
+	fillInputNeurons();
+}
+void s21::MLP::genWeights()
+{
+	srand(time(nullptr));
+	for (int i = 1; i < _weights.size(); ++i)
+	{
+		for (int j = 0; j < _weights[i].size(); ++j)
+		{
+			for (int w = 0; w < _weights[i][j].size(); ++w)
+				_weights[i][j][w] = ( std::rand() % 2000 - 1000) * 0.001;
+		}
+	}
+}
+void s21::MLP::fillInputNeurons()
+{
+	static int inputIndex;
+
+	for (int i = 0; i < inNeuronsNb; ++i)
+		_neurons[0][i] = _input[inputIndex][i + 1] / 255;
+	++inputIndex;
+	if (inputIndex >= _input.size())
+		exitError("out of input in file");
 }
 void	s21::MLP::exitError(const std::string &massage)
 {
@@ -45,8 +64,8 @@ void s21::MLP::fileToInput(const std::string &fileName)
 		i.clear();
 	_input.clear();
 
-	static std::ifstream	fin(fileName, std::ios::in);
-	if (!fin.bad())
+	std::ifstream	fin(fileName, std::ios::in);
+	if (!fin.bad() && fin.is_open())
 	{
 		std::vector<double>	numbers;
 		std::string 		line;
@@ -67,25 +86,25 @@ void s21::MLP::fileToInput(const std::string &fileName)
 		}
 	}
 	else
-		exitError("can't open file");
+		exitError("couldn't open file");
 }
 
 void s21::MLP::predict()
 {
+	double product = 0;
 
-}
-
-
-/*
- void dot_product_on_neurons_with_sig1(double neurons[], int n_size,
-				 const double input[], double (*weight)[3], int i_size)
-{
-	for (int i = 0; i < n_size; ++i)
+	for (int i = 1; i < _layersNb; ++i)
 	{
-		double product = 0;
-		for (int j = 0; j < i_size; ++j)
-			product += input[j] * weight[i][j];
-		neurons[i] = sigmoid(product);
+		for (int j = 0; j < _neurons[i].size(); ++j)
+		{
+			product = 0;
+			for (int w = 0; w < _weights[i][j].size(); ++w)
+				product += _neurons[i - 1][w] * _weights[i][j][w];
+			_neurons[i][j] = sigmoid(product);
+		}
 	}
 }
- */
+void s21::MLP::backpropagation()
+{
+
+}
