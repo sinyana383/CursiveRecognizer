@@ -1,8 +1,38 @@
 #include "MLP.hpp"
 
-void s21::MLP::initMatrix()
+void s21::MLP::initMatrix(int layersNb)
 {
+    _layersNb = layersNb;
+    _sigmoidRes.resize(_layersNb - 1);
+    _weights.resize(_layersNb - 1);
 
+    // set size to _weights and _sigmoidRes
+    for (int i = 0; i < _layersNb - 2; ++i)
+    {
+        _sigmoidRes[i].resize(hiddenNeuronsNb);
+        _weights[i].resize(hiddenNeuronsNb);
+        for (int j = 0; j < hiddenNeuronsNb; ++j)
+        {
+            if (i == 0)
+                _weights[i][j].resize(inNeuronsNb);
+            else
+                _weights[i][j].resize(hiddenNeuronsNb);
+        }
+    }
+
+    // init weights
+    srand(time(nullptr));
+    for (int i = 0; i < _weights.size(); ++i)
+    {
+        for (int j = 0; j < _weights[i].size(); ++j)
+        {
+            for (int w = 0; w < _weights[i][j].size(); ++w)
+                _weights[i][j][w] = rand() % 1000 * 0.001;
+        }
+    }
+
+    _sigmoidRes[_layersNb - 2].resize(outNeuronsNb);
+    _weights[_layersNb - 2].resize()    // че делать
 }
 void	s21::MLP::exitError(const std::string &massage)
 {

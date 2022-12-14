@@ -6,7 +6,10 @@
 
 #include <vector>
 #include <string>
-#include <math.h>
+
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
 
 namespace s21
 {
@@ -20,11 +23,11 @@ namespace s21
 		std::vector<std::vector<double>> _input;
 
 		int 											_layersNb;
-		std::vector<std::vector<double>> 				_layersWithNeurons;
-		std::vector<std::vector<std::vector<double>>> 	_layersWithWeights;
+		std::vector<std::vector<double>> 				_sigmoidRes;
+		std::vector<std::vector<std::vector<double>>> 	_weights;
 
 	public:
-		void 	initMatrix();
+		void 	initMatrix(int _layersNb);
 		void 	fileToInput(const std::string &fileName);
 		void	exitError(const std::string &massage);
 
