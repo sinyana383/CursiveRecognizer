@@ -5,9 +5,11 @@ int main()
 	s21::MLP mlp;
 
 	auto start = std::chrono::steady_clock::now();
+	for (int i = 0; i < )
 	mlp.fileToInput("/Users/ddurrand/Desktop/MLP_CPP/datasets/file1");
 	mlp.initMatrix(5);
 	mlp.predict();
+	mlp.backpropagation();
 	auto end = std::chrono::steady_clock::now();
 	auto diff = end - start;
 	std::cout << std::chrono::duration <double> (diff).count() << " sec" << std::endl;
