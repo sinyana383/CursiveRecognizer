@@ -73,7 +73,7 @@ void	s21::MLP::genWeights()
 		for (int j = 0; j < _weights[i].size(); ++j)
 		{
 			for (int w = 0; w < _weights[i][j].size(); ++w)
-				_weights[i][j][w] = ( std::rand() % 2000 - 1000) * 0.001;
+				_weights[i][j][w] = ( std::rand() % 1000 - 600) * 0.001;
 		}
 	}
 }
@@ -109,11 +109,11 @@ void	s21::MLP::predict()
 void	s21::MLP::backpropagation()
 {
 	std::vector<double> expected(outNeuronsNb, 0);
-	expected[static_cast<int>(_input[_inputIndex][0])] = 1;
+	expected[static_cast<int>(_input[_inputIndex][0]) - 1] = 1;
 
 	for (int l = _layersNb - 1; l > 0; --l)
 	{
-		for (int n = 0; n < outNeuronsNb; ++n)
+		for (int n = 0; n < _neurons[l].size(); ++n)
 		{
 			double err = 0;
 			if (l == _layersNb - 1)
@@ -122,7 +122,7 @@ void	s21::MLP::backpropagation()
 			{
 				// прошлого лок градиента и привязанных весов к нейрону i
 				for (int i = 0; i < _localGradArray[l + 1].size(); ++i)
-					err += _localGradArray[l + 1][n] * _weights[l + 1][i][n];
+					err += _localGradArray[l + 1][i] * _weights[l + 1][i][n];
 			}
 			double localGrad = err * df_sigmoid(_neurons[l][n]);
 			_localGradArray[l][n] = localGrad;
@@ -130,8 +130,45 @@ void	s21::MLP::backpropagation()
 		}
 	}
 }
+
 void	s21::MLP::changeWeights(int l, int n, double localGrad)
 {
 	for (int w = 0; w < _weights[l][n].size(); ++w)
 		_weights[l][n][w] -= _neurons[l - 1][w] * localGrad * LerningStep;
 }
+
+void s21::MLP::crossValid()
+{
+	for (int i = 0; i < k; ++i)
+	{
+		for (int j = 0; j < _input.size() / k; ++j)
+		{
+			if (j == i)
+				continue;
+
+		}
+	}
+}
+
+void s21::MLP::test()
+{
+	_inputIndex = -1;
+	for (int i = 0; i < _input.size() - 10; ++i)
+	{
+		fillInputNeurons();
+		predict();
+		backpropagation();
+	}
+
+}
+
+void s21::MLP::printOutNeurons()
+{
+	double max;
+	for (double n : _neurons[_layersNb - 1])
+	{
+		if (max < )
+		std::cout << n << std::endl;
+	}
+}
+

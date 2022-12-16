@@ -5,14 +5,15 @@ int main()
 	s21::MLP mlp;
 
 	auto start = std::chrono::steady_clock::now();
-	for (int i = 0; i < )
-	mlp.fileToInput("/Users/ddurrand/Desktop/MLP_CPP/datasets/file1");
+	mlp.fileToInput("/Users/ddurrand/Desktop/MLP_CPP/datasets/emnist-letters-train.csv");
 	mlp.initMatrix(5);
-	mlp.predict();
-	mlp.backpropagation();
+	mlp.test();
 	auto end = std::chrono::steady_clock::now();
 	auto diff = end - start;
 	std::cout << std::chrono::duration <double> (diff).count() << " sec" << std::endl;
+	mlp.fillInputNeurons();
+	mlp.predict();
+	mlp.printOutNeurons();
 }
 
 /*

@@ -17,11 +17,12 @@ namespace s21
 	constexpr int 		outNeuronsNb = 26;
 	constexpr int 		hiddenNeuronsNb = 100;
 	constexpr double	LerningStep = 0.1;
+	constexpr int		k = 10;
 
 	class MLP
 	{
 	private:
-		int									_inputIndex = -1;
+		int									_inputIndex;
 		std::vector<std::vector<double>>	_input;
 
 		int 											_layersNb;
@@ -36,14 +37,16 @@ namespace s21
 		void 	fillInputNeurons();
 		void	exitError(const std::string &massage);
 
-		static double	sigmoid(double a) { return 2/(1 + exp(-a)) - 1; }
-		void 			predict();
-
-		static double		df_sigmoid(double a){ return 0.5 * (1 + a) * (1 - a); }
+		static double		sigmoid(double a) { return 1/(1 + exp(-a)); }
+		static double		df_sigmoid(double a){ return a * (1 - a); }
 		void				changeWeights(int l, int n, double localGrad);
 		void				backpropagation();
+		void 				predict();
 
+		void crossValid();
 		void test();
+
+		void printOutNeurons();
 	};
 }
 
