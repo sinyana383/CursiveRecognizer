@@ -9,8 +9,7 @@ void s21::MLP::fileToInput(const std::string &fileName) {
     std::vector<double> numbers;
     std::string line;
     while (fin >> line) {
-      numbers.reserve(inNeuronsNb);  // поч не экономит время?
-
+//      numbers.reserve(inNeuronsNb);  // поч не экономит время?
       char *pStart = &(line[0]);
       char *pEnd;
       do {
@@ -29,32 +28,45 @@ void s21::MLP::initMatrix(int layersNb) {
   _layersNb = layersNb;
   _neurons.resize(_layersNb);
   _weights.resize(_layersNb);
+  _crossWeights.resize(_layersNb);
   _localGradArray.resize(_layersNb);
   _neurons[0].resize(inNeuronsNb);
   _weights[0].resize(0);
+  _crossWeights[0].resize(0);
   _localGradArray[0].resize(0);
 
   for (int i = 1; i < _layersNb - 1; ++i) {
     _neurons[i].resize(hiddenNeuronsNb);
     _weights[i].resize(hiddenNeuronsNb);
+	_crossWeights[i].resize(hiddenNeuronsNb);
     _localGradArray[i].resize(hiddenNeuronsNb);
     for (int j = 0; j < hiddenNeuronsNb; ++j) {
       if (i == 1)
+	  {
         _weights[i][j].resize(inNeuronsNb);
+		_crossWeights[i][j].resize(inNeuronsNb, 0);
+	  }
       else
+	  {
         _weights[i][j].resize(hiddenNeuronsNb);
+		_crossWeights[i][j].resize(hiddenNeuronsNb, 0);
+	  }
     }
   }
 
   _neurons[_layersNb - 1].resize(outNeuronsNb);
   _weights[_layersNb - 1].resize(outNeuronsNb);
+  _crossWeights[_layersNb - 1].resize(outNeuronsNb);
   _localGradArray[_layersNb - 1].resize(outNeuronsNb);
   for (int j = 0; j < outNeuronsNb; ++j)
+  {
     _weights[_layersNb - 1][j].resize(hiddenNeuronsNb);
+	_crossWeights[_layersNb - 1][j].resize(hiddenNeuronsNb, 0);
+  }
 
   // init weights and neurons
   genWeights();
-  fillInputNeurons();
+  fillInputNeurons(0);
 }
 void s21::MLP::genWeights() {
   srand(time(nullptr));
@@ -65,11 +77,10 @@ void s21::MLP::genWeights() {
     }
   }
 }
-void s21::MLP::fillInputNeurons() {
-  ++_inputIndex;
+void s21::MLP::fillInputNeurons(int inputIndex) {
+  if (inputIndex >= _input.size()) exitError("out of input in file");
   for (int i = 0; i < inNeuronsNb; ++i)
-    _neurons[0][i] = _input[_inputIndex][i + 1] / 255;
-  if (_inputIndex >= _input.size()) exitError("out of input in file");
+    _neurons[0][i] = _input[inputIndex][i + 1] / 255;
 }
 void s21::MLP::exitError(const std::string &massage) {
   std::cout << massage << std::endl;
@@ -89,10 +100,7 @@ void s21::MLP::predict() {
   }
 }
 
-void s21::MLP::backpropagation() {
-  std::vector<double> expected(outNeuronsNb, 0);
-  expected[static_cast<int>(_input[_inputIndex][0]) - 1] = 1;
-
+void s21::MLP::backpropagation(std::vector<double> expected) {
   for (int l = _layersNb - 1; l > 0; --l) {
     for (int n = 0; n < _neurons[l].size(); ++n) {
       double err = 0;
@@ -105,41 +113,78 @@ void s21::MLP::backpropagation() {
       }
       double localGrad = err * df_sigmoid(_neurons[l][n]);
       _localGradArray[l][n] = localGrad;
-      changeWeights(l, n, localGrad);
+	  calcCrossWeights(l, n, localGrad);
     }
   }
 }
 
-void s21::MLP::changeWeights(int l, int n, double localGrad) {
-  for (int w = 0; w < _weights[l][n].size(); ++w)
-    _weights[l][n][w] -= _neurons[l - 1][w] * localGrad * LerningStep;
+void s21::MLP::calcCrossWeights(int l, int n, double localGrad) {
+  for (int w = 0; w < _crossWeights[l][n].size(); ++w)
+    _weights[l][n][w] -= _neurons[l - 1][w] * localGrad * LerningStep; // _crossWeights
 }
 
 void s21::MLP::crossValid() {
   for (int i = 0; i < k; ++i) {
-    for (int j = 0; j < _input.size() / k; ++j) {
-      if (j == i) continue;
+    for (int j = 0; j < _input.size(); ++j) {
+	  if (j == i * (_input.size() / k))
+	  {
+		j += _input.size() / k;
+		if (j >= _input.size())
+		  break;
+	  }
+//	  else if (j % (_input.size() / k) == 0 && j != 0)
+//		changeWeights();
       std::vector<double> expected(outNeuronsNb, 0);
       expected[static_cast<int>(_input[j][0]) - 1] = 1;
+	  fillInputNeurons(j);
+	  predict();
+	  backpropagation(expected);
     }
+	int right = 0;
+	for (int j = i * (_input.size() / k); j <  i * (_input.size() / k) + (_input.size() / k); ++j)
+	{
+	  fillInputNeurons(j);
+	  predict();
+	  int indexMax = std::max_element(_neurons[_layersNb - 1].begin(), _neurons[_layersNb - 1].end()) - _neurons[_layersNb - 1].begin(); // !!!
+	  if (indexMax + 1 == _input[j][0])
+		++right;
+	  printOutNeurons();
+	}
+	std::cout << right << " / " << _input.size() / k << std::endl;
   }
 }
 
-void s21::MLP::test() {
-  _inputIndex = -1;
-  for (int i = 0; i < _input.size() - 5; ++i) {
-    fillInputNeurons();
-    predict();
-    backpropagation();
-  }
-  for (int i = _input.size() - 5; i < _input.size(); ++i) {
-    std::cout << "expected - ";
-    std::cout << _input[_inputIndex + 1][0] << std::endl;
-    fillInputNeurons();
-    predict();
-    printOutNeurons();
+void s21::MLP::changeWeights() {
+  for (int l = _layersNb - 1; l > 0; --l)
+  {
+	for (int n = 0; n < _weights[l].size(); ++n)
+	{
+	  for (int w = 0; w < _weights[l][n].size(); ++w)
+	  {
+		_weights[l][n][w] += _crossWeights[l][n][w] / (_input.size() / k);
+		_crossWeights[l][n][w] = 0;
+	  }
+	}
   }
 }
+
+//void s21::MLP::test() {
+//  int inputIndex = 0;
+//  for (int i = 0; i < _input.size() - 5; ++i) {
+//	fillInputNeurons(inputIndex);
+//	++inputIndex;
+//    predict();
+//	backpropagation();
+//  }
+//  for (int i = _input.size() - 5; i < _input.size(); ++i) {
+//    std::cout << "expected - ";
+//    std::cout << _input[inputIndex][0] << std::endl;
+//	fillInputNeurons(inputIndex);
+//	++inputIndex;
+//    predict();
+//    printOutNeurons();
+//  }
+//}
 
 void s21::MLP::printOutNeurons() {
   double max = -2;
