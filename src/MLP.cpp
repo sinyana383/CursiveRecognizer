@@ -100,13 +100,11 @@ void s21::MLP::backpropagation(std::vector<double> expected) {
       if (l == _layersNb - 1)
         err = _neurons[l][n] - expected[n];
       else {
-        // прошлого лок градиента и привязанных весов к нейрону i
         for (int i = 0; i < _localGradArray[l + 1].size(); ++i)
           err += _localGradArray[l + 1][i] * _weights[l + 1][i][n];
       }
       double localGrad = err * df_sigmoid(_neurons[l][n]);
       _localGradArray[l][n] = localGrad;
-	  if (localGrad - 0.00000001 > 0)
 	  	changeWeights(l, n, localGrad);
     }
   }
@@ -188,7 +186,7 @@ void s21::MLP::printOutNeurons() {
 }
 void s21::MLP::weightsToFile() {
   std::ofstream file;
-  file.open("weights.w", std::ios::out | std::ios::trunc);
+  file.open(WEIGHTSFILE, std::ios::out | std::ios::trunc);
   if (!file.bad() && file.is_open()) {
 	for (int l = 1; l < _weights.size(); ++l)
 	{
@@ -205,11 +203,11 @@ void s21::MLP::weightsToFile() {
 	}
   }
   else
-	exitError("couldn't creat weights.w file");
+	exitError("couldn't creat WEIGHTSFILE file");
   file.close();
 }
 void s21::MLP::weightsFromFile() {
-  std::ifstream fin("weights.w", std::ios::in);
+  std::ifstream fin(WEIGHTSFILE, std::ios::in);
   if (!fin.bad() && fin.is_open()) {
 	std::vector<double> numbers;
 	std::string line;
@@ -226,7 +224,7 @@ void s21::MLP::weightsFromFile() {
 	  } while (*pEnd);
 
 	  if (w != _weights[l][n].size())
-		exitError("wrong weights number in weights.w");
+		exitError("wrong weights number in WEIGHTSFILE");
 	  n++;
 	  if (n == _weights[l].size())
 	  {
@@ -234,11 +232,11 @@ void s21::MLP::weightsFromFile() {
 		++l;
 	  }
 	  if (l > _weights.size())
-		exitError("wrong layer number in weights.w");
+		exitError("wrong layer number in WEIGHTSFILE");
 	}
 	if (l != _weights.size())
-	  exitError("wrong layer number in weights.w");
+	  exitError("wrong layer number in WEIGHTSFILE");
   }
   else
-	exitError("couldn't open weights.w file");
+	exitError("couldn't open WEIGHTSFILE file");
 }

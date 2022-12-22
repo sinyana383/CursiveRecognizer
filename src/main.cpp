@@ -15,3 +15,5 @@ int main()
 	auto diff = end - start;
 	std::cout << std::chrono::duration <double> (diff).count() << " sec" << std::endl;
 }
+
+// 1500

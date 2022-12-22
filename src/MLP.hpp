@@ -10,13 +10,14 @@
 #include <vector>
 
 #define FILENAME "/Users/ddurrand/Desktop/MLP_CPP 2/datasets/emnist-letters-train.csv"
+#define WEIGHTSFILE "weights2.w"
 
 namespace s21 {
 constexpr int inNeuronsNb = 784;
 constexpr int outNeuronsNb = 26;
-constexpr int hiddenNeuronsNb = 100;
-constexpr double LerningStep = 0.1;
-constexpr int k = 8;
+constexpr int hiddenNeuronsNb = 35;
+constexpr double LerningStep = 0.25;
+constexpr int k = 4;
 
 class MLP {
  private:
