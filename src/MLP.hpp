@@ -16,7 +16,7 @@ constexpr int inNeuronsNb = 784;
 constexpr int outNeuronsNb = 26;
 constexpr int hiddenNeuronsNb = 100;
 constexpr double LerningStep = 0.1;
-constexpr int k = 10;
+constexpr int k = 8;
 
 class MLP {
  private:
@@ -26,8 +26,6 @@ class MLP {
   std::vector<std::vector<double>> _neurons;
   std::vector<std::vector<std::vector<double>>> _weights;
   std::vector<std::vector<double>> _localGradArray;
-
-  std::vector<std::vector<std::vector<double>>> _crossWeights;
 
  public:
   void fileToInput(const std::string &fileName);
@@ -40,12 +38,15 @@ class MLP {
   static double df_sigmoid(double a) { return a * (1.0 - a); }
   void backpropagation(std::vector<double> expected);
   void predict();
-  void changeWeights();
+//  void changeWeights();
 
   void crossValid();
-  void calcCrossWeights(int l, int n, double localGrad);
-  void test();
+  void changeWeights(int l, int n, double localGrad);
 
+  void weightsToFile();
+  void weightsFromFile();
+
+  void test();
   void printOutNeurons();
 };
 }  // namespace s21
