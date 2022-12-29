@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "MLP.hpp"
 
 void s21::MLP::fileToInput(const std::string &fileName) {
@@ -27,16 +28,22 @@ void s21::MLP::initMatrix(int layersNb) {
   // set size to _weights and _sigmoidRes
   _layersNb = layersNb;
   _neurons.resize(_layersNb);
+  _bias.resize(_layersNb);
   _weights.resize(_layersNb);
-  _localGradArray.resize(_layersNb);
+  _weightsGradArray.resize(_layersNb);
+  _biasGradArray.resize(_layersNb);
   _neurons[0].resize(inNeuronsNb);
+  _bias[0].resize(inNeuronsNb);
   _weights[0].resize(0);
-  _localGradArray[0].resize(0);
+  _weightsGradArray[0].resize(0);
+  _biasGradArray[0].resize(0);
 
   for (int i = 1; i < _layersNb - 1; ++i) {
     _neurons[i].resize(hiddenNeuronsNb);
+    _bias[i].resize(hiddenNeuronsNb);
     _weights[i].resize(hiddenNeuronsNb);
-    _localGradArray[i].resize(hiddenNeuronsNb);
+    _weightsGradArray[i].resize(hiddenNeuronsNb);
+    _biasGradArray[i].resize(hiddenNeuronsNb);
     for (int j = 0; j < hiddenNeuronsNb; ++j) {
       if (i == 1)
 	  {
@@ -50,8 +57,10 @@ void s21::MLP::initMatrix(int layersNb) {
   }
 
   _neurons[_layersNb - 1].resize(outNeuronsNb);
+  _bias[_layersNb - 1].resize(outNeuronsNb);
   _weights[_layersNb - 1].resize(outNeuronsNb);
-  _localGradArray[_layersNb - 1].resize(outNeuronsNb);
+  _weightsGradArray[_layersNb - 1].resize(outNeuronsNb);
+  _biasGradArray[_layersNb - 1].resize(outNeuronsNb);
   for (int j = 0; j < outNeuronsNb; ++j)
   {
     _weights[_layersNb - 1][j].resize(hiddenNeuronsNb);
@@ -65,6 +74,7 @@ void s21::MLP::genWeights() {
   srand(time(nullptr));
   for (int i = 1; i < _weights.size(); ++i) {
     for (int j = 0; j < _weights[i].size(); ++j) {
+        _bias[i][j] = (std::rand() % 1000 - 600) * 0.001;
       for (int w = 0; w < _weights[i][j].size(); ++w)
         _weights[i][j][w] = (std::rand() % 1000 - 600) * 0.001;
     }
@@ -81,13 +91,14 @@ void s21::MLP::exitError(const std::string &massage) {
 }
 
 void s21::MLP::predict() {
-  double product = 0;
+  double product;
 
   for (int i = 1; i < _layersNb; ++i) {
     for (int j = 0; j < _weights[i].size(); ++j) {
       product = 0;
       for (int w = 0; w < _weights[i][j].size(); ++w)
         product += _neurons[i - 1][w] * _weights[i][j][w];
+      product += _bias[i][j];
       _neurons[i][j] = sigmoid(product);
     }
   }
@@ -98,14 +109,24 @@ void s21::MLP::backpropagation(std::vector<double> expected) {
     for (int n = 0; n < _neurons[l].size(); ++n) {
       double err = 0;
       if (l == _layersNb - 1)
-        err = _neurons[l][n] - expected[n];
-      else {
-        for (int i = 0; i < _localGradArray[l + 1].size(); ++i)
-          err += _localGradArray[l + 1][i] * _weights[l + 1][i][n];
+      {
+          err = _neurons[l][n] - expected[n];
+          _weightsGradArray[l][n] = err * df_sigmoid(_neurons[l][n]);
       }
-      double localGrad = err * df_sigmoid(_neurons[l][n]);
-      _localGradArray[l][n] = localGrad;
-	  	changeWeights(l, n, localGrad);
+      else {
+        for (int i = 0; i < _weightsGradArray[l + 1].size(); ++i)
+          err += _weightsGradArray[l + 1][i] * _weights[l + 1][i][n];
+        _weightsGradArray[l][n] = err * df_sigmoid(_neurons[l][n]);
+        err = 0;
+        for (int i = 0; i < _biasGradArray[l + 1].size(); ++i)
+            err += _biasGradArray[l + 1][i] * _bias[l + 1][i]; // ???
+        _biasGradArray[l][n] = err * df_sigmoid(_neurons[l][n]);
+      }
+
+      if (std::abs(_weightsGradArray[l][n]) - 0.0001 > 0)
+	  	changeWeights(l, n, _weightsGradArray[l][n]);
+      if (std::abs(_biasGradArray[l][n]) - 0.0001 > 0)
+        _bias[l][n] -= _neurons[l - 1][n] * _biasGradArray[l][n] * LerningStep;
     }
   }
 }
