@@ -7,15 +7,15 @@ int main()
 
 	mlp.fileToInput(FILENAME);
 	mlp.initMatrix(4);
-//	mlp.weightsFromFile();
+	mlp.weightsFromFile();
     auto start = std::chrono::steady_clock::now();
-	mlp.crossValid();
-    mlp.crossValid();
+//	mlp.crossValid();
+//	mlp.crossValid();
     auto end = std::chrono::steady_clock::now();
     auto diff = end - start;
     std::cout << std::chrono::duration <double> (diff).count() << " sec" << std::endl;
-	mlp.weightsToFile();
-//	mlp.test();
+//	mlp.weightsToFile();
+	mlp.test();
 }
 
-// 1500
+//_weights[i][j][w] = (std::rand() % 2000 - 1000) * 0.001;

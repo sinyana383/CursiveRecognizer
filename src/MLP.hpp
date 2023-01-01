@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#define FILENAME "D:\\projects\\MLP\\datasets\\emnist-letters-train.csv"
+#define FILENAME "C:\\Users\\1\\Desktop\\MLP\\datasets\\emnist-letters-test.csv"
 #define WEIGHTSFILE "weights2.w"
 
 namespace s21 {
@@ -25,10 +25,8 @@ class MLP {
 
   int _layersNb;
   std::vector<std::vector<double>> _neurons;
-  std::vector<std::vector<double>> _bias;
   std::vector<std::vector<std::vector<double>>> _weights;
-  std::vector<std::vector<double>> _weightsGradArray;
-  std::vector<std::vector<double>> _biasGradArray;
+  std::vector<std::vector<double>> _localGradArray;
 
  public:
   void fileToInput(const std::string &fileName);
@@ -45,12 +43,12 @@ class MLP {
 
   void crossValid();
   void changeWeights(int l, int n, double localGrad);
-  void changeBiases(int l, int n, double localGrad);
 
   void weightsToFile();
   void weightsFromFile();
 
   void test();
+  void epoch();
   void printOutNeurons();
 };
 }  // namespace s21
