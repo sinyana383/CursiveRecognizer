@@ -1,56 +1,36 @@
-#ifndef CPP7_MLP_MLP_HPP
-#define CPP7_MLP_MLP_HPP
+#ifndef CPP7_MLP_SRC_MLP_HPP_
+#define CPP7_MLP_SRC_MLP_HPP_
 
+#include <vector>
 #include <cmath>
-#include <cstdlib>
-#include <ctime>
 #include <fstream>
 #include <iostream>
-#include <string>
-#include <vector>
-
-#define FILENAME "C:\\Users\\1\\Desktop\\MLP\\datasets\\emnist-letters-test.csv"
-#define WEIGHTSFILE "weights2.w"
 
 namespace s21 {
 constexpr int inNeuronsNb = 784;
 constexpr int outNeuronsNb = 26;
-constexpr int hiddenNeuronsNb = 35;
+constexpr int hiddenNeuronsNb = 40;
 constexpr double LerningStep = 0.25;
-constexpr int k = 4;
+constexpr int k = 2;
 
 class MLP {
- private:
+ protected:
   std::vector<std::vector<double>> _input;
-
   int _layersNb;
-  std::vector<std::vector<double>> _neurons;
-  std::vector<std::vector<std::vector<double>>> _weights;
-  std::vector<std::vector<double>> _localGradArray;
 
  public:
-  void fileToInput(const std::string &fileName);
-  void initMatrix(int _layersNb);
-  void genWeights();
-  void fillInputNeurons(int inputIndex);
-  void exitError(const std::string &massage);
+  void getDataFromFile(const std::string &fileName);
+  virtual void exportWeightsToFile() = 0;
+  virtual void importWeightsFromFile() = 0;
+  virtual void genWeights() = 0;
+
+  virtual void initModel(int _layersNb) = 0;
+  virtual void crossValid() = 0;
 
   static double sigmoid(double a) { return 1.0 / (1.0 + std::exp(-a)); }
   static double df_sigmoid(double a) { return a * (1.0 - a); }
-  void backpropagation(std::vector<double> expected);
-  void predict();
-//  void changeWeights();
-
-  void crossValid();
-  void changeWeights(int l, int n, double localGrad);
-
-  void weightsToFile();
-  void weightsFromFile();
-
-  void test();
-  void epoch();
-  void printOutNeurons();
+  static void exitError(const std::string &massage); // заменить exception-ом?
 };
-}  // namespace s21
+}
 
-#endif  // CPP7_MLP_MLP_HPP
+#endif //CPP7_MLP_SRC_MLP_HPP_
