@@ -84,10 +84,11 @@ void s21::Layer::ClearFunction() {
    for (size_t i = 0; i < count_neuron_; i++) {  // Сколько нейронов вывести
      std::cout << "    Нейрон [" << i + 1 << "]: "
                << "\n";
-     layer_[i].PrintNeuron();
+//     layer_[i].PrintNeuron();
    }
 
-    std::cout << "    Нейрон [" << count_neuron_ << "]: "
-              << "\n";
-    layer_[count_neuron_ - 1].PrintNeuron();
+   // std::cout << "    Нейрон [" << count_neuron_ << "]: "  // Последний
+
+   //           << "\n";
+   // layer_[count_neuron_ - 1].PrintNeuron();
  }

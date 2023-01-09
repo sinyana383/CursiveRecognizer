@@ -4,7 +4,7 @@ s21::Neuron::Neuron() {}
 
 void s21::Neuron::GenerateWeight() {
   for (size_t i = 0; i < array_weight_.size(); i++) {
-    array_weight_[i] = 0.001 * (std::rand() % 2001 - 1000);
+    array_weight_[i] = (std::rand() % 2000 - 1000) * 0.001;;
   }
 }
 
@@ -37,21 +37,21 @@ void s21::Neuron::ClearFunction() {
   error_ = 0;
 }
 
- void s21::Neuron::PrintNeuron() {
-   std::cout << "      Значение :     " << value_ << "\n";  // Значения
+// void s21::Neuron::PrintNeuron() {
+//   std::cout << "      Значение :     " << value_ << "\n";  // Значения
 
-   std::cout << "      Ошибка :       " << error_ << "\n";  // Значения
+//   std::cout << "      Ошибка :       " << error_ << "\n";  // Значения
 
-   std::cout << "      Дельта весов : " << delta_weight_ << "\n";  // Значения
+//   std::cout << "      Дельта весов : " << delta_weight_ << "\n";  // Значения
 
-   std::cout << "      (Весов : " << count_weight_ << ") {\n";  // Веса
-   std::cout << "                    ";
-   for (int i = 0; i < count_weight_ / 20; i++) {
-     // for (int i = 0; i < count_weight_; i++) {
-     std::cout << array_weight_[i] << " ";
-   }
-   std::cout << "\n                    }"
-             << "\n";
+//   std::cout << "      (Весов : " << count_weight_ << ") {\n";  // Веса
+//   std::cout << "                    ";
+//   for (int i = 0; i < count_weight_ / 20; i++) {
+//     // for (int i = 0; i < count_weight_; i++) {
+//     std::cout << array_weight_[i] << " ";
+//   }
+//   std::cout << "\n                    }"
+//             << "\n";
 
-   std::cout << "\n";
- }
+//   std::cout << "\n";
+// }

@@ -1,36 +1,55 @@
-#ifndef CPP7_MLP_SRC_MLP_HPP_
-#define CPP7_MLP_SRC_MLP_HPP_
+#ifndef COMMON_H
+#define COMMON_H
 
-#include <vector>
+#include <atomic>
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <map>
+#include <mutex>
+#include <vector>
 
 namespace s21 {
-constexpr int inNeuronsNb = 784;
-constexpr int outNeuronsNb = 26;
-constexpr int hiddenNeuronsNb = 40;
+constexpr int size_string = 1024;
 constexpr double LerningStep = 0.25;
-constexpr int k = 2;
+constexpr double outNeuronsNb = 26;
+constexpr double hiddenNeuronsNb = 40;
+constexpr double inNeuronsNb = 784;
+constexpr int full_sample = 5; //? или обосновать или удалить
 
 class MLP {
+ public:
+  // Input
+  void getDataFromFile(std::string const &fileName);
+  std::vector<std::vector<double>> GetInput() { return _input; }
+  void ClearInput();
+
+  // Common
+  std::vector<double> CalculateMetrics();
+  // static
+  static double sigmoid(double value) { return 1.0 / (1.0 + exp(-value)); }
+  static double df_sigmoid(double value) { return value * (1 - value); }
+  static void exitError(const std::string &massage);
+
  protected:
   std::vector<std::vector<double>> _input;
-  int _layersNb;
 
- public:
-  void getDataFromFile(const std::string &fileName);
-  virtual void exportWeightsToFile() = 0;
-  virtual void importWeightsFromFile() = 0;
-  virtual void genWeights() = 0;
+  // test/train
+  int k = 0;
+  int _rightPredicts = 0;
 
-  virtual void initModel(int _layersNb) = 0;
-  virtual void crossValid() = 0;
+  // metrics
+  int true_positive = 0;
+  int true_negative = 0;
+  int false_positive = 0;
+  int false_negative = 0;
 
-  static double sigmoid(double a) { return 1.0 / (1.0 + std::exp(-a)); }
-  static double df_sigmoid(double a) { return a * (1.0 - a); }
-  static void exitError(const std::string &massage); // заменить exception-ом?
+  double accuracy = 0;
+  double f_measure = 0;
+  double precision = 0;
+  double recall = 0;
+  std::vector<double> metrics{};
 };
-}
 
-#endif //CPP7_MLP_SRC_MLP_HPP_
+}
+#endif  

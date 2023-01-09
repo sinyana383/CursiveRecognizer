@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "MLP.hpp"
+#include "../MLP.hpp"
 
 #define FILENAME "/Users/ddurrand/Desktop/MLP/datasets/emnist-letters-train.csv"
 #define WEIGHTSFILE "weights2.w"
@@ -17,32 +17,27 @@ namespace s21 {
 
 class Matrix : public MLP{
  private:
-  std::vector<std::vector<double>> _input;
-
   int _layersNb;
   std::vector<std::vector<double>> _neurons;
   std::vector<std::vector<std::vector<double>>> _weights;
   std::vector<std::vector<double>> _localGradArray;
 
  public:
-  void fileToInput(const std::string &fileName);
-  void initModel(int _layersNb) override;
-  void genWeights() override;
+  void initModel(int _layersNb);
+  void genWeights();
   void fillInputNeurons(int inputIndex);
 
   void backpropagation(std::vector<double> expected);
   void predict();
-//  void changeWeights();
 
-  void crossValid() override;
-  void changeWeights(int l, int n, double localGrad);
+  void crossValid();
 
-  void exportWeightsToFile() override;
-  void importWeightsFromFile() override;
+  void exportWeightsToFile(const std::string &fileName);
+  void importWeightsFromFile(std::string const &fileName);
 
+  void train(int inputIndex);
   void test();
   void epoch();
-  void printOutNeurons();
 };
 }  // namespace s21
 

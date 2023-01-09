@@ -11,7 +11,7 @@ class Neuron {
   Neuron();
   ~Neuron() {}
   void GenerateWeight();
-   void PrintNeuron();
+  // void PrintNeuron();
 
   void SetCountWeight(int count_weight);
   void SetValue(double value);
