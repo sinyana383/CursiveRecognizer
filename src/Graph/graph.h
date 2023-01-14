@@ -47,7 +47,7 @@ class GraphPerceptron : public MLP {
   std::vector<int> FindMaximumPredict();
 
   //________________________Test_________________________//
-  void Test(int test_sample);
+  void Test(double test_sample);
   void TestForthBack(int d) ;
   double CalculatePercent(int k_group) ;
   void CountingSuccessfulLetters();

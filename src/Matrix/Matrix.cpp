@@ -16,13 +16,9 @@ void s21::Matrix::initModel(int layersNb) {
     _localGradArray[i].resize(hiddenNeuronsNb);
     for (int j = 0; j < hiddenNeuronsNb; ++j) {
       if (i == 1)
-	  {
         _weights[i][j].resize(inNeuronsNb);
-	  }
       else
-	  {
         _weights[i][j].resize(hiddenNeuronsNb);
-	  }
     }
   }
 
@@ -33,8 +29,6 @@ void s21::Matrix::initModel(int layersNb) {
   {
     _weights[_layersNb - 1][j].resize(hiddenNeuronsNb);
   }
-
-  genWeights();
 }
 void s21::Matrix::genWeights() {
   srand(time(nullptr));
@@ -63,6 +57,20 @@ void s21::Matrix::predict() {
     }
   }
 }
+void s21::Matrix::calcMetrix(int expectedIndex) {
+  int indexMax = std::max_element(_neurons[_layersNb - 1].begin(), _neurons[_layersNb - 1].end()) - _neurons[_layersNb - 1].begin();
+  if (indexMax + 1 == _input[expectedIndex][0]){
+    _rightPredicts++;
+    true_positive += 1;
+    true_negative += 25;
+  }
+  else
+  {
+    false_negative += 1;
+    false_positive += 1;
+    true_negative += 24;
+  }
+}
 
 void s21::Matrix::backpropagation(std::vector<double> expected) {
   for (int l = _layersNb - 1; l > 0; --l) {
@@ -85,69 +93,75 @@ void s21::Matrix::backpropagation(std::vector<double> expected) {
   }
 }
 
-void s21::Matrix::crossValid() {
-  for (int i = 0; i < k; ++i) {
+void s21::Matrix::train(int inputIndex) {
+  std::vector<double> expected(outNeuronsNb, 0);
+  expected[static_cast<int>(_input[inputIndex][0]) - 1] = 1;
+  fillInputNeurons(inputIndex);
+  predict();
+  backpropagation(expected);
+}
+void s21::Matrix::crossValid(int k) {
+  _k = k;
+  size_t inputPart = _input.size() / _k;
+  for (int i = 0; i < _k; ++i) {
     for (int j = 0; j < _input.size(); ++j) {
-	  if (j == i * (_input.size() / k))
+	  if (j == i * inputPart)
 	  {
-		j += _input.size() / k;
+		j += inputPart;
 		if (j >= _input.size())
 		  break;
 	  }
       train(j);
     }
-	int right = 0;
-	for (int j = i * (_input.size() / k); j <  i * (_input.size() / k) + (_input.size() / k); ++j)
+
+	_rightPredicts = 0;
+	for (int j = i * inputPart; j <  i * inputPart + inputPart; ++j)
 	{
 	  fillInputNeurons(j);
 	  predict();
 	  int indexMax = std::max_element(_neurons[_layersNb - 1].begin(), _neurons[_layersNb - 1].end()) - _neurons[_layersNb - 1].begin(); // !!!
 	  if (indexMax + 1 == _input[j][0])
-		++right;
+		++_rightPredicts; // calcMetrics?
 	}
-	std::cout << right << " / " << _input.size() / k << std::endl;
+	std::cout << _rightPredicts << " / " << inputPart << std::endl;
+    if (i < k - 1) genWeights(); // зачем?
   }
 }
 
 
-void s21::Matrix::epoch()
+void s21::Matrix::epoch(int n, std::vector<double> &errors)
 {
-  int inputIndex = 0;
-  _rightPredicts = 0;
-  for (int i = 0; i < _input.size(); ++i) {
-    fillInputNeurons(inputIndex);
-    std::vector<double> expected(outNeuronsNb, 0);
-    expected[static_cast<int>(_input[inputIndex][0]) - 1] = 1;
-    ++inputIndex;
-    predict();
-    backpropagation(expected);
-    int indexMax = std::max_element(_neurons[_layersNb - 1].begin(), _neurons[_layersNb - 1].end()) - _neurons[_layersNb - 1].begin();
-    if (indexMax + 1 == _input[i][0])
-      ++_rightPredicts;
+  for (int e = 0; e < n; ++e)
+  {
+    int inputIndex = 0;
+    _rightPredicts = 0;
+    for (int i = 0; i < _input.size(); ++i) {
+      fillInputNeurons(inputIndex);
+      std::vector<double> expected(outNeuronsNb, 0);
+      expected[static_cast<int>(_input[inputIndex][0]) - 1] = 1;
+      ++inputIndex;
+      predict();
+      backpropagation(expected);
+      int indexMax = std::max_element(_neurons[_layersNb - 1].begin(), _neurons[_layersNb - 1].end()) - _neurons[_layersNb - 1].begin();
+      if (indexMax + 1 == _input[i][0])
+        ++_rightPredicts; // calcMetrics?
+    }
+    errors.push_back(100 - static_cast<float>(_rightPredicts)/_input.size() * 100);
   }
-  std::cout << _rightPredicts << " / " << _input.size() << std::endl;
 }
 
-void s21::Matrix::test()
+void s21::Matrix::test(double part)
 {
   int inputIndex = 0;
   _rightPredicts = 0;
-  for (int i = 0; i < _input.size(); ++i) {
+  int testSize = (int)((double)_input.size() * part);
+  for (int i = 0; i < testSize; ++i) {
 	fillInputNeurons(inputIndex);
 	++inputIndex;
 	predict();
-	int indexMax = std::max_element(_neurons[_layersNb - 1].begin(), _neurons[_layersNb - 1].end()) - _neurons[_layersNb - 1].begin();
-	if (indexMax + 1 == _input[i][0])
-	  ++_rightPredicts;
+    calcMetrix(i);
   }
-  std::cout << _rightPredicts << " / " << _input.size() << std::endl;
-}
-void s21::Matrix::train(int inputIndex) {
-  std::vector<double> expected(outNeuronsNb, 0); // запихнуть в train
-  expected[static_cast<int>(_input[inputIndex][0]) - 1] = 1;
-  fillInputNeurons(inputIndex);
-  predict();
-  backpropagation(expected);
+  std::cout << _rightPredicts << " / " << testSize << std::endl;
 }
 
 void s21::Matrix::exportWeightsToFile(const std::string &fileName) {
@@ -159,12 +173,7 @@ void s21::Matrix::exportWeightsToFile(const std::string &fileName) {
 	  for (int n = 0; n < _weights[l].size(); ++n)
 	  {
 		for (int w = 0; w < _weights[l][n].size(); ++w)
-		{
-		  file << _weights[l][n][w];
-		  if (w < _weights[l][n].size() - 1)
-			file << ",";
-		}
-		file << std::endl;
+		  file << _weights[l][n][w] << ",";
 	  }
 	}
   }
@@ -177,30 +186,30 @@ void s21::Matrix::importWeightsFromFile(std::string const &fileName) {
   if (!fin.bad() && fin.is_open()) {
 	std::vector<double> numbers;
 	std::string line;
-	int l = 1, n = 0, w;
-	while (std::getline(fin, line)) {
+    int ll = 0;
+	while (fin >> line) {
 	  char *pStart = &(line[0]);
 	  char *pEnd;
 
-	  w = 0;
-	  do {
-		_weights[l][n][w] = std::strtod(pStart, &pEnd);
-		++w;
-		pStart = pEnd + 1;
-	  } while (*pEnd);
-
-	  if (w != _weights[l][n].size())
-		exitError("wrong weights number in weights.w");
-	  n++;
-	  if (n == _weights[l].size())
-	  {
-		n = 0;
-		++l;
-	  }
-	  if (l > _weights.size())
-		exitError("wrong layer number in weights.w");
-	}
-	if (l != _weights.size())
+      for (int l = 0; l < _weights.size(); ++l)
+      {
+        for (int n = 0; n < _weights[l].size(); ++n)
+        {
+          int w = 0;
+          do {
+            _weights[l][n][w] = std::strtod(pStart, &pEnd);
+            ++w;
+            pStart = pEnd + 1;
+          } while (*pEnd && w < _weights[l][n].size());
+          if (w != _weights[l][n].size())
+            exitError("wrong weights number in weights.w");
+        }
+        if (l >= _weights.size())
+          exitError("wrong layer number in weights.w");
+        ll = l;
+      }
+    }
+	if (ll != _weights.size() - 1)
 	  exitError("wrong layer number in weights.w");
   }
   else

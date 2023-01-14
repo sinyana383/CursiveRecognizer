@@ -30,14 +30,15 @@ class Matrix : public MLP{
   void backpropagation(std::vector<double> expected);
   void predict();
 
-  void crossValid();
+  void crossValid(int k);
 
   void exportWeightsToFile(const std::string &fileName);
   void importWeightsFromFile(std::string const &fileName);
 
   void train(int inputIndex);
-  void test();
-  void epoch();
+  void test(double part);
+  void epoch(int n, std::vector<double> &errors);
+  void calcMetrix(int expectedIndex);
 };
 }  // namespace s21
 

@@ -3,6 +3,7 @@
 s21::Neuron::Neuron() {}
 
 void s21::Neuron::GenerateWeight() {
+//  srand(time(nullptr));
   for (size_t i = 0; i < array_weight_.size(); i++) {
     array_weight_[i] = (std::rand() % 2000 - 1000) * 0.001;;
   }

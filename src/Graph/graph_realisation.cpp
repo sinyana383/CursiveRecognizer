@@ -52,11 +52,11 @@ void GraphPerceptron::EpochTrain(int epoch, std::vector<double> *report_graph)
   size_letter_for_epoch = epoch * (int)vector_vectorovi4.size();
   for (int k = 0; k < epoch; k++) 
   {
+    _rightPredicts = 0;
     for (size_t d = 0; d < vector_vectorovi4.size(); d++)
     {
       TrainForthBack(d);
     }
-    std::cout << CalculatePercentTrain() << std::endl;
     report_graph->push_back(100 - (CalculatePercentTrain() * 100));
   }
 }
@@ -222,11 +222,11 @@ std::vector<int> GraphPerceptron::FindMaximumPredict()
   return index_max;
 }
 
-void GraphPerceptron::Test(int test_sample) 
+void GraphPerceptron::Test(double test_sample)
 {
   _rightPredicts = 0;
   size_letter_for_epoch =
-      (int)vector_for_test.size() * test_sample / full_sample;
+      (int)((double)vector_for_test.size() * test_sample);
   for (size_t d = 0; d < (size_t)size_letter_for_epoch; d++)
   {
     TestForthBack(d);
@@ -300,31 +300,31 @@ void GraphPerceptron::ResizePerceptron(int count_hidden_layers)
 }
 
 void GraphPerceptron::CrossValidation(std::string filename_train, int k_validation) {
-  k = k_validation;
+  _k = k_validation;
   getDataFromFile(filename_train);
   vector_vectorovi4 = GetInput();
   vector_for_test = GetInput();
   size_letter_for_epoch = k_validation * (int)vector_vectorovi4.size();
-  int one_part = vector_vectorovi4.size() / k;
+  int one_part = vector_vectorovi4.size() / _k;
 
-  for (int k_count = 1; k_count <= k; k_count++) {
+  for (int k_count = 1; k_count <= _k; k_count++) {
 	_rightPredicts = 0;
     int progress_count = 0;
-    for (int k_inner = 1; k_inner <= k; k_inner++) {
+    for (int k_inner = 1; k_inner <= _k; k_inner++) {
       if (k_inner == k_count) k_inner++;
       for (int d = one_part * (k_inner - 1);
-           k_inner <= k && d < (one_part * k_inner);
+           k_inner <= _k && d < (one_part * k_inner);
            d++, progress_count++) {
         TrainForthBack(d);
       }
     }
-    progress_count = one_part * (k - 1);
+    progress_count = one_part * (_k - 1);
     for (int d = one_part * (k_count - 1); d < (one_part * k_count);
          d++, progress_count++) {
       TestForthBack(d);
     }
-    std::cout << CalculatePercent(k) << std::endl;
-    if (k_count < k) GenerateWeightNeuron();
+    std::cout << CalculatePercent(_k) << std::endl;
+    if (k_count < _k) GenerateWeightNeuron(); // что это?
   }
 }
 

@@ -35,7 +35,7 @@ class MLP {
   std::vector<std::vector<double>> _input;
 
   // test/train
-  int k = 0;
+  int _k = 0;
   int _rightPredicts = 0;
 
   // metrics
