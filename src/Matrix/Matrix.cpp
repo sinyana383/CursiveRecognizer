@@ -92,7 +92,19 @@ void s21::Matrix::backpropagation(std::vector<double> expected) {
     }
   }
 }
+std::vector<int> s21::Matrix::predictLetter() {
+  fillInputNeurons(0);
+  predict();
 
+  std::vector<int> results;
+  std::vector<double> sorted(_neurons[_layersNb - 1]);
+  std::sort(sorted.begin(), sorted.end());
+  auto iBegin = _neurons[_layersNb - 1].begin();
+  for (int i = sorted.size() - 1; i > sorted.size() - 1 - 4; --i)
+    results.push_back(
+		std::find(_neurons[_layersNb - 1].begin(), _neurons[_layersNb - 1].end(), sorted[i]) - iBegin);
+  return results;
+}
 void s21::Matrix::train(int inputIndex) {
   std::vector<double> expected(outNeuronsNb, 0);
   expected[static_cast<int>(_input[inputIndex][0]) - 1] = 1;
@@ -215,4 +227,3 @@ void s21::Matrix::importWeightsFromFile(std::string const &fileName) {
   else
 	exitError("couldn't open weights.w file");
 }
-

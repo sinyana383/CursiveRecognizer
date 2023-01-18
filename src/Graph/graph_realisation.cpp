@@ -151,7 +151,7 @@ void GraphPerceptron::SaveWeights(const std::string &saveFile)
 void GraphPerceptron::LoadWeights(std::string const &filename_weights)
 {
   std::ifstream inweights(filename_weights, std::ios::in);
-  if (!inweights.bad()) 
+  if (!inweights.bad() && inweights.is_open())
   {
     std::string line;
 
@@ -186,8 +186,8 @@ void GraphPerceptron::LoadWeights(std::string const &filename_weights)
 
 std::vector<int> GraphPerceptron::Predict(std::string name_image) 
 {
-  LoadValuesTest(name_image);
-  Test(full_sample);
+//  LoadValuesTest(name_image);
+  Test(1);
   return FindMaximumPredict();
 }
 

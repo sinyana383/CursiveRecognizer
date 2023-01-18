@@ -12,24 +12,26 @@ int main(void)
 //  testGraph();
 //  testMatrix();
 
-  Control con;
+  s21::Control con;
   std::vector<double> errors;
 
-//  con.setMlpType(GRAPH);
+//  con.setMlpType(MATRIX);
 //  con.setHiddenLayerNb(2);
-//  con.train(1,errors);
+//  con.train(4,errors);
 //  con.saveWeights("weights.w");
 //  printErrors(errors);
 //  errors.clear();
 
-  con.setMlpType(MATRIX);
-//  con.train(2, errors);
-  con.loadWeights("weights.w");
-  con.test(0.5);
+//  con.setMlpType(GRAPH);
+////  con.train(2, errors);
+//  con.loadWeights("weights.w");
+//  con.test(1);
 
-  con.setMlpType(GRAPH);
-  con.loadWeights("weights.w");
-  con.crossValidation(5);
+  con.setMlpType(MATRIX);
+  con.setTestFile("letter");
+//  con.loadWeights("weights.w");
+//  con.test(1);
+  con.predict(errors);
   return 0;
 }
 void printErrors(std::vector<double> &errors) {

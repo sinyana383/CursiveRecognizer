@@ -13,6 +13,8 @@ namespace s21 {
 
 class GraphPerceptron : public MLP {
  public:
+  void setInput(std::vector<std::vector<double>> const &input) override { _input = input;  vector_vectorovi4 = _input; vector_for_test = _input; }
+
   //___________Create_And_Init_GraphPerceptron___________//
   GraphPerceptron();
   GraphPerceptron(int layer_hidden_count);

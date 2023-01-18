@@ -10,11 +10,13 @@
 #include "../Matrix/Matrix.hpp"
 #include "../Graph/graph.h"
 
-#define DEFAULTTRAIN "C:\\Users\\1\\Desktop\\MLP\\emnist-letters-train.csv"
-#define DEFAULTTEST "C:\\Users\\1\\Desktop\\MLP\\emnist-letters-test.csv"
+#define DEFAULTTRAIN "/Users/ddurrand/Desktop/untitled3/emnist-letters-train.csv"
+#define DEFAULTTEST "/Users/ddurrand/Desktop/untitled3/emnist-letters-test.csv"
+#define DEFAULTWEIGHTS "/Users/ddurrand/Desktop/untitled3/weights.w"
 #define MATRIX false
 #define GRAPH true
 
+namespace s21 {
 class Control {
  private:
   s21::Matrix _matrix;
@@ -26,19 +28,22 @@ class Control {
   std::vector<double> _errors;
   std::string _trainFile = DEFAULTTRAIN;
   std::string _testFile = DEFAULTTEST;
+  std::string _weightsFile = DEFAULTWEIGHTS;
  public:
   Control();
   void setMlpType(bool type);
   void setHiddenLayerNb(int nb);
-  void setTrainFile(std::string const& trainFile) { _trainFile = trainFile; }
-  void setTestFile(std::string const& testFile) { _testFile = testFile; }
+  void setTrainFile(std::string const &trainFile) { _trainFile = trainFile; }
+  void setTestFile(std::string const &testFile) { _testFile = testFile; }
 
-  void saveWeights(std::string const& fileName);
-  void loadWeights(std::string const& fileName);
+  void saveWeights(std::string const &fileName);
+  void loadWeights(std::string const &fileName);
 
+  std::vector<int> predict(std::vector<double> pixel);
   void crossValidation(int k);
   void train(int epochNb, std::vector<double> &errors);
   void test(double part); // там какой-то testSample
 };
+}
 
 #endif //CPP7_MLP_SRC_CONTROL_HPP_

@@ -27,17 +27,18 @@ class Matrix : public MLP{
   void genWeights();
   void fillInputNeurons(int inputIndex);
 
-  void backpropagation(std::vector<double> expected);
-  void predict();
-
-  void crossValid(int k);
-
   void exportWeightsToFile(const std::string &fileName);
   void importWeightsFromFile(std::string const &fileName);
 
+  void backpropagation(std::vector<double> expected);
+  void predict();
+
+  std::vector<int> predictLetter();
+  void crossValid(int k);
   void train(int inputIndex);
   void test(double part);
   void epoch(int n, std::vector<double> &errors);
+
   void calcMetrix(int expectedIndex);
 };
 }  // namespace s21

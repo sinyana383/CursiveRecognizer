@@ -22,6 +22,7 @@ class MLP {
   // Input
   void getDataFromFile(std::string const &fileName);
   std::vector<std::vector<double>> GetInput() { return _input; }
+  virtual void setInput(std::vector<std::vector<double>> const &input) { _input = input; }
   void ClearInput();
 
   // Common
