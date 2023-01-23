@@ -24,7 +24,7 @@ void Control::loadWeights(const std::string &fileName) {
 
 void Control::crossValidation(int k) { // не работает
   if (_mlpType == MATRIX) {
-    _matrix.getDataFromFile(_trainFile);
+    if (_matrix.getDataFromFile(_trainFile) < 0) return;
     _matrix.genWeights();
     _matrix.crossValid(k);
   } else {
@@ -48,22 +48,24 @@ std::vector<int> Control::predict(std::vector<double> pixel) { // вернет �
 
 void Control::train(int epochNb, std::vector<double> &errors) {
   if (_mlpType == MATRIX) {
-    _matrix.getDataFromFile(_trainFile);
+    if (_matrix.getDataFromFile(_trainFile) < 0) return;
     _matrix.genWeights();
     _matrix.epoch(epochNb, errors);
   } else {
-    _graph.LoadValuesTrain(_trainFile);
+    if (_graph.LoadValuesTrain(_trainFile) < 0) return;
     _graph.GenerateWeightNeuron();
     _graph.EpochTrain(epochNb, &errors);
   }
 }
-void Control::test(double part) {
+std::vector<double> Control::test(double part) {
   if (_mlpType == MATRIX) {
-    _matrix.getDataFromFile(_testFile);
+    if (_matrix.getDataFromFile(_testFile) < 0) return std::vector<double>(0);
     _matrix.test(part);
+	return _matrix.CalculateMetrics();
   } else {
-    _graph.LoadValuesTest(_testFile);
+    if (_graph.LoadValuesTest(_testFile) < 0) return std::vector<double>(0);
     _graph.Test(part);
+	return _graph.CalculateMetrics();
   }
 }
 

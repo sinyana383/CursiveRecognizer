@@ -2,7 +2,7 @@
 
 namespace s21 {
 
-void MLP::getDataFromFile(std::string const &fileName) {
+int MLP::getDataFromFile(std::string const &fileName) {
   ClearInput();
 
   std::ifstream fin(fileName, std::ios::in);
@@ -17,12 +17,15 @@ void MLP::getDataFromFile(std::string const &fileName) {
 		numbers.push_back(std::strtod(pStart, &pEnd));
 		pStart = pEnd + 1;
 	  } while (*pEnd);
-	  if (numbers.size() != 785) exitError("size is not 784 pixels");
+	  if (numbers.size() != 785) return error("size is not 784 pixels");
 	  _input.push_back(numbers);
 	  numbers.clear();
 	}
   } else
-	exitError("couldn't open file");
+	return error("couldn't open file");
+  if(_input.empty())
+	return error("empty file");
+  return 1;
 }
 
 void MLP::ClearInput() {
@@ -41,14 +44,21 @@ std::vector<double> MLP::CalculateMetrics() {
   recall = (double) true_positive / (double) (true_positive + false_negative);
   f_measure = 2 * ((precision * recall) / (precision + recall));
 
+  _rightPredicts = 0;
+  true_positive = 0;
+  true_negative = 0;
+  false_positive = 0;
+  false_negative = 0;
+
   metrics.push_back(accuracy);
   metrics.push_back(precision);
   metrics.push_back(recall);
   metrics.push_back(f_measure);
+  metrics.push_back(_time);
   return metrics;
 }
-void MLP::exitError(const std::string &massage) {
+int MLP::error(const std::string &massage) {
   std::cout << massage << std::endl;
-  exit(EXIT_FAILURE);
+  return -1;
 }
 }

@@ -28,7 +28,7 @@ class Matrix : public MLP{
   void fillInputNeurons(int inputIndex);
 
   void exportWeightsToFile(const std::string &fileName);
-  void importWeightsFromFile(std::string const &fileName);
+  int importWeightsFromFile(std::string const &fileName);
 
   void backpropagation(std::vector<double> expected);
   void predict();

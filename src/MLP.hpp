@@ -8,6 +8,7 @@
 #include <map>
 #include <mutex>
 #include <vector>
+#include <ctime>
 
 namespace s21 {
 constexpr int size_string = 1024;
@@ -20,7 +21,7 @@ constexpr int full_sample = 5; //? или обосновать или удали
 class MLP {
  public:
   // Input
-  void getDataFromFile(std::string const &fileName);
+  int getDataFromFile(std::string const &fileName);
   std::vector<std::vector<double>> GetInput() { return _input; }
   virtual void setInput(std::vector<std::vector<double>> const &input) { _input = input; }
   void ClearInput();
@@ -30,7 +31,7 @@ class MLP {
   // static
   static double sigmoid(double value) { return 1.0 / (1.0 + exp(-value)); }
   static double df_sigmoid(double value) { return value * (1 - value); }
-  static void exitError(const std::string &massage);
+  static int error(const std::string &massage);
 
  protected:
   std::vector<std::vector<double>> _input;
@@ -49,6 +50,8 @@ class MLP {
   double f_measure = 0;
   double precision = 0;
   double recall = 0;
+  double _time = 0;
+
   std::vector<double> metrics{};
 };
 

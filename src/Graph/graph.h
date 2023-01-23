@@ -22,8 +22,8 @@ class GraphPerceptron : public MLP {
   void GenerateWeightNeuron();
 
   //_____________________Parse_File______________________//
-  void LoadValuesTrain(std::string const &filename_train);
-  void LoadValuesTest(std::string const &filename_test);
+  int LoadValuesTrain(std::string const &filename_train);
+  int LoadValuesTest(std::string const &filename_test);
   // void SetStartValues(const char* filename_train, const char* filename_test);
 
   //________________________Train________________________//

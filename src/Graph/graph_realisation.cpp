@@ -35,16 +35,18 @@ void GraphPerceptron::GenerateWeightNeuron()
     layers_[i].SetWeightsNeuron();
 }
 
-void GraphPerceptron::LoadValuesTrain(std::string const &filename_train) 
+int GraphPerceptron::LoadValuesTrain(std::string const &filename_train)
 {
-  getDataFromFile(filename_train);
+  if (getDataFromFile(filename_train) < 0) return -1;
   vector_vectorovi4 = GetInput();
+  return 1;
 }
 
-void GraphPerceptron::LoadValuesTest(std::string const &filename_test) 
+int GraphPerceptron::LoadValuesTest(std::string const &filename_test)
 {
-  getDataFromFile(filename_test);
+  if (getDataFromFile(filename_test) < 0) return -1;
   vector_for_test = GetInput();
+  return 1;
 }
 
 void GraphPerceptron::EpochTrain(int epoch, std::vector<double> *report_graph) 
@@ -224,6 +226,7 @@ std::vector<int> GraphPerceptron::FindMaximumPredict()
 
 void GraphPerceptron::Test(double test_sample)
 {
+  auto start = std::chrono::steady_clock::now();
   _rightPredicts = 0;
   size_letter_for_epoch =
       (int)((double)vector_for_test.size() * test_sample);
@@ -231,6 +234,9 @@ void GraphPerceptron::Test(double test_sample)
   {
     TestForthBack(d);
   }
+  auto end = std::chrono::steady_clock::now();
+  auto diff = end - start;
+  _time = std::chrono::duration <double> (diff).count();
   std::cout << CalculatePercent(1) << std::endl;
 }
 
@@ -245,7 +251,7 @@ void GraphPerceptron::TestForthBack(int d)
 
 double GraphPerceptron::CalculatePercent(int k_group) 
 {
-  return _rightPredicts / (double)vector_for_test.size() / k_group;
+  return _rightPredicts / ((double)vector_for_test.size() / k_group);
 }
 
 void GraphPerceptron::CountingSuccessfulLetters() 
@@ -266,7 +272,7 @@ void GraphPerceptron::CountingSuccessfulLetters()
 
 void GraphPerceptron::Testing(char *filename_test) 
 {
-  LoadValuesTest(filename_test);
+  if (LoadValuesTest(filename_test) < 0) return;
   Test(full_sample);
 }
 
@@ -301,30 +307,26 @@ void GraphPerceptron::ResizePerceptron(int count_hidden_layers)
 
 void GraphPerceptron::CrossValidation(std::string filename_train, int k_validation) {
   _k = k_validation;
-  getDataFromFile(filename_train);
+  if (getDataFromFile(filename_train) < 0) return;
   vector_vectorovi4 = GetInput();
   vector_for_test = GetInput();
   size_letter_for_epoch = k_validation * (int)vector_vectorovi4.size();
   int one_part = vector_vectorovi4.size() / _k;
 
   for (int k_count = 1; k_count <= _k; k_count++) {
-	_rightPredicts = 0;
-    int progress_count = 0;
     for (int k_inner = 1; k_inner <= _k; k_inner++) {
       if (k_inner == k_count) k_inner++;
       for (int d = one_part * (k_inner - 1);
            k_inner <= _k && d < (one_part * k_inner);
-           d++, progress_count++) {
+           d++) {
         TrainForthBack(d);
       }
     }
-    progress_count = one_part * (_k - 1);
-    for (int d = one_part * (k_count - 1); d < (one_part * k_count);
-         d++, progress_count++) {
+	_rightPredicts = 0;
+    for (int d = one_part * (k_count - 1); d < (one_part * k_count); d++)
       TestForthBack(d);
-    }
     std::cout << CalculatePercent(_k) << std::endl;
-    if (k_count < _k) GenerateWeightNeuron(); // что это?
+//    if (k_count < _k) GenerateWeightNeuron(); // что это?
   }
 }
 

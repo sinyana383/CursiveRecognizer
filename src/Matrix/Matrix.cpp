@@ -40,7 +40,7 @@ void s21::Matrix::genWeights() {
   }
 }
 void s21::Matrix::fillInputNeurons(int inputIndex) {
-  if (inputIndex >= _input.size()) exitError("out of input in file");
+  if (inputIndex >= _input.size()) error("out of input in file");
   for (int i = 0; i < inNeuronsNb; ++i)
     _neurons[0][i] = _input[inputIndex][i + 1] / 255;
 }
@@ -136,7 +136,7 @@ void s21::Matrix::crossValid(int k) {
 		++_rightPredicts; // calcMetrics?
 	}
 	std::cout << _rightPredicts << " / " << inputPart << std::endl;
-    if (i < k - 1) genWeights(); // зачем?
+//    if (i < k - 1) genWeights(); // зачем?
   }
 }
 
@@ -164,6 +164,7 @@ void s21::Matrix::epoch(int n, std::vector<double> &errors)
 
 void s21::Matrix::test(double part)
 {
+  auto start = std::chrono::steady_clock::now();
   int inputIndex = 0;
   _rightPredicts = 0;
   int testSize = (int)((double)_input.size() * part);
@@ -173,6 +174,9 @@ void s21::Matrix::test(double part)
 	predict();
     calcMetrix(i);
   }
+  auto end = std::chrono::steady_clock::now();
+  auto diff = end - start;
+  _time = std::chrono::duration <double> (diff).count();
   std::cout << _rightPredicts << " / " << testSize << std::endl;
 }
 
@@ -190,10 +194,13 @@ void s21::Matrix::exportWeightsToFile(const std::string &fileName) {
 	}
   }
   else
-	exitError("couldn't creat weights.w file");
+  {
+	error("couldn't creat weights.w file");
+	return;
+  }
   file.close();
 }
-void s21::Matrix::importWeightsFromFile(std::string const &fileName) {
+int s21::Matrix::importWeightsFromFile(std::string const &fileName) {
   std::ifstream fin(fileName, std::ios::in);
   if (!fin.bad() && fin.is_open()) {
 	std::vector<double> numbers;
@@ -214,16 +221,17 @@ void s21::Matrix::importWeightsFromFile(std::string const &fileName) {
             pStart = pEnd + 1;
           } while (*pEnd && w < _weights[l][n].size());
           if (w != _weights[l][n].size())
-            exitError("wrong weights number in weights.w");
+			return error("wrong weights number in weights.w");
         }
         if (l >= _weights.size())
-          exitError("wrong layer number in weights.w");
+		  return error("wrong layer number in weights.w");
         ll = l;
       }
     }
 	if (ll != _weights.size() - 1)
-	  exitError("wrong layer number in weights.w");
+	  return error("wrong layer number in weights.w");
   }
   else
-	exitError("couldn't open weights.w file");
+	return error("couldn't open weights.w file");
+  return 1;
 }

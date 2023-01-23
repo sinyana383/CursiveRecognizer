@@ -19,8 +19,8 @@
 namespace s21 {
 class Control {
  private:
-  s21::Matrix _matrix;
-  s21::GraphPerceptron _graph;
+  s21::Matrix 			_matrix;
+  s21::GraphPerceptron 	_graph;
 
   bool _mlpType = MATRIX; // должно отображ у пользователя
   int _hiddenLayeresNb = 2;
@@ -42,7 +42,7 @@ class Control {
   std::vector<int> predict(std::vector<double> pixel);
   void crossValidation(int k);
   void train(int epochNb, std::vector<double> &errors);
-  void test(double part); // там какой-то testSample
+  std::vector<double> test(double part); // там какой-то testSample
 };
 }
 
