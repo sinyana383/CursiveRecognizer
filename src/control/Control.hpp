@@ -41,8 +41,8 @@ class Control {
 
   std::vector<int> predict(std::vector<double> pixel);
   void crossValidation(int k);
-  void train(int epochNb, std::vector<double> &errors);
-  std::vector<double> test(double part); // там какой-то testSample
+  void train(int epochNb, std::vector<double> &errors); // ошибки
+  std::vector<double> test(double part); // Метрики
 };
 }
 
