@@ -140,7 +140,7 @@ void MainWindow::on_commandLinkButton_clicked()
 {
     if (!IsClickedCommandButton)
     {
-        ui->uploadFileButton->setText("Train file");
+        ui->fileLabel->setText("Train file");
         ui->runButton->setText("Run train");
         ui->testLayout->hide();
         ui->trainLayoutWidget->show();
@@ -148,7 +148,7 @@ void MainWindow::on_commandLinkButton_clicked()
     }
     else
     {
-        ui->uploadFileButton->setText("Test file");
+        ui->fileLabel->setText("Test file");
         ui->runButton->setText("Run test");
         ui->trainLayoutWidget->hide();
         ui->testLayout->show();
