@@ -55,22 +55,22 @@ MainWindow::MainWindow(QWidget *parent)
       x[i] = i/50.0 - 1; // x goes from -1 to 1
       y[i] = x[i]*x[i]; // let's plot a quadratic function
     }
-    ui->widget_2->addGraph();
-    ui->widget_2->graph(0)->addData(x,y);
+    ui->functionWidjet->addGraph();
+    ui->functionWidjet->graph(0)->addData(x,y);
     QPen pen;
     pen.setWidth(3);
     pen.setColor(QColor(188, 190, 251));
-    ui->widget_2->graph(0)->setPen(pen);
-    //ui->widget_2->graph(0)->setPen(Qcolor)
-    ui->widget_2->yAxis->grid()->setVisible(false);
-    ui->widget_2->xAxis->grid()->setVisible(false);
-    ui->widget_2->xAxis->setLabel("EPOCH");
-    ui->widget_2->yAxis->setLabel("ERROR VALUE");
-    ui->widget_2->yAxis->setRange(*std::min_element(y.begin(), y.end()),*std::max_element(y.begin(), y.end()));
-    ui->widget_2->xAxis->setRange(0,*std::max_element(x.begin(), x.end()));
-    ui->widget_2->setBackground(QColor(190, 251, 188));
-    //ui->widget_2->replot();
-    //ui->widget_2->setBackground(Color::yellow)
+    ui->functionWidjet->graph(0)->setPen(pen);
+    //ui->functionWidjet->graph(0)->setPen(Qcolor)
+    ui->functionWidjet->yAxis->grid()->setVisible(false);
+    ui->functionWidjet->xAxis->grid()->setVisible(false);
+    ui->functionWidjet->xAxis->setLabel("EPOCH");
+    ui->functionWidjet->yAxis->setLabel("ERROR VALUE");
+    ui->functionWidjet->yAxis->setRange(*std::min_element(y.begin(), y.end()),*std::max_element(y.begin(), y.end()));
+    ui->functionWidjet->xAxis->setRange(0,*std::max_element(x.begin(), x.end()));
+    ui->functionWidjet->setBackground(QColor(190, 251, 188));
+    //ui->functionWidjet->replot();
+    //ui->functionWidjet->setBackground(Color::yellow)
     ui->trainLayoutWidget->hide();
     ui->label_19->setWordWrap(true);
     ui->commandLinkButton->setIcon(QIcon(":/images/settings-gear.png"));
@@ -82,7 +82,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->recall->setText("--");
     ui->time->setText("--");
     ui->precision->setText("--");
-    is_matrix = ui->radioButton_4->isChecked();
+    is_matrix = ui->radioButtonMatrix->isChecked();
 }
 
 void MainWindow::changeValueOfSlider()
@@ -140,12 +140,16 @@ void MainWindow::on_commandLinkButton_clicked()
 {
     if (!IsClickedCommandButton)
     {
+        ui->uploadFileButton->setText("Train file");
+        ui->runButton->setText("Run train");
         ui->testLayout->hide();
         ui->trainLayoutWidget->show();
         IsClickedCommandButton = true;
     }
     else
     {
+        ui->uploadFileButton->setText("Test file");
+        ui->runButton->setText("Run test");
         ui->trainLayoutWidget->hide();
         ui->testLayout->show();
         IsClickedCommandButton = false;
@@ -188,9 +192,9 @@ void MainWindow::on_pushButton_3_clicked()
 void MainWindow::on_pushButton_4_clicked()
 {
     bool is_int = true;
-    auto upload_weights = QFileDialog::getOpenFileName(this, tr("Open File"), "/path/to/file/", tr("Text File (*.txt)"));
-    //QMessageBox::information(0,"info",upload_weights);
-    QFile file(upload_weights);
+    auto csvFile = QFileDialog::getOpenFileName(this, tr("Open File"), "/path/to/file/", tr("Text File (*.txt)"));
+    //QMessageBox::information(0,"info",csvFile);
+    QFile file(csvFile);
     //std::string  line;
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
        {
@@ -217,7 +221,7 @@ void MainWindow::on_pushButton_4_clicked()
 void MainWindow::on_pushButton_5_clicked()
 {
     auto download_weights = QFileDialog::getSaveFileName(this, tr("Save File"), "/path/to/file/", tr("Text File (*.txt)"));
-    //QMessageBox::information(0,"info",upload_weights);
+    //QMessageBox::information(0,"info",csvFile);
     QFile file(download_weights);
     //std::string  line;
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -237,14 +241,55 @@ void MainWindow::on_pushButton_5_clicked()
 }
 
 
-void MainWindow::on_radioButton_3_clicked()
+void MainWindow::on_radioButtonMatrix_clicked()
 {
-    is_matrix = ui->radioButton_4->isChecked();
+    is_matrix = ui->radioButtonMatrix->isChecked();
 }
 
 
-void MainWindow::on_radioButton_4_clicked()
+void MainWindow::on_radioButtonGraph_clicked()
 {
-    is_matrix = ui->radioButton_4->isChecked();
+    is_matrix = ui->radioButtonMatrix->isChecked();
+}
+
+
+void MainWindow::on_pushButton_2_clicked()
+{
+
+}
+
+
+void MainWindow::on_uploadFileButton_clicked()
+{
+    bool is_int = true;
+    auto csvFile = QFileDialog::getOpenFileName(this, tr("Open File"), "/path/to/file/", tr("Text File (*.txt)"));
+    //QMessageBox::information(0,"info",csvFile);
+    QFile file(csvFile);
+    //std::string  line;
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+       {
+           QMessageBox::information(0,"error",file.errorString());
+           return;
+       }
+    QTextStream out(&file);
+     QString line = out.readLine();
+     list = line.split(" ");
+     //QMessageBox::information(0,"info",list[0]);
+     for (int i = 0; i<list.length();i++)
+     {
+         list[i].toInt(&is_int);
+         if (!is_int)
+         {
+             QMessageBox::information(0,"error","Not numbers in csv");
+             return;
+         }
+     }
+     file.close();
+}
+
+
+void MainWindow::on_runButton_clicked()
+{
+
 }
 
