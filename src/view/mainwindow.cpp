@@ -49,6 +49,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->label_2->setText(QString::number(layers));
     ui->label_23->setText(QString::number(epoch));
     ui->label_25->setText(QString::number(groups));
+
+    ui->secondPred->setStyleSheet("color: rgba(255, 255, 255, 0.5);");
+    ui->thirdPred->setStyleSheet("color: rgba(255, 255, 255, 0.25);");
+    ui->forthPred->setStyleSheet("color: rgba(255, 255, 255, 0.125);");
+
     QVector<double> x(101), y(101); // initialize with entries 0..100
     for (int i=0; i<101; ++i)
     {
