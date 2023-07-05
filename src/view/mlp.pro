@@ -17,7 +17,7 @@ SOURCES += \
     form.cpp \
     main.cpp \
     mainwindow.cpp \
-    qcustomplot.cpp
+    qcustomplot.cpp \
     ../control/Control.cpp
 
 HEADERS += \
@@ -28,7 +28,7 @@ HEADERS += \
     ../model/Matrix/Matrix.hpp \
     form.h \
     mainwindow.h \
-    qcustomplot.h
+    qcustomplot.h \
     ../control/Control.hpp
 
 FORMS += \

@@ -7,8 +7,10 @@
 
 #include <string>
 #include <vector>
-#include "../Matrix/Matrix.hpp"
-#include "../Graph/graph.h"
+
+#include "mainwindow.h"
+#include "../model/Matrix/Matrix.hpp"
+#include "../model/Graph/graph.h"
 
 #define DEFAULTTRAIN "/Users/ddurrand/Desktop/untitled3/emnist-letters-train.csv"
 #define DEFAULTTEST "/Users/ddurrand/Desktop/untitled3/emnist-letters-test.csv"
@@ -19,8 +21,10 @@
 namespace s21 {
 class Control {
  private:
+    // replace to MLP class
   s21::Matrix 			_matrix;
   s21::GraphPerceptron 	_graph;
+  MainWindow w;
 
   bool _mlpType = MATRIX; // должно отображ у пользователя
   int _hiddenLayeresNb = 2;
@@ -31,6 +35,7 @@ class Control {
   std::string _weightsFile = DEFAULTWEIGHTS;
  public:
   Control();
+  void showWindow() {w.show();}
   void setMlpType(bool type);
   void setHiddenLayerNb(int nb);
   void setTrainFile(std::string const &trainFile) { _trainFile = trainFile; }

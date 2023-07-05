@@ -1,19 +1,20 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-void MainWindow::handleButton()
+void MainWindow::Recognize()
 {
-    if (!(ui->paintWidjet->Pixels_draw.empty()) && ui->radioButton->isChecked())
+
+    if (!(ui->paintWidjet->Pixels_draw.empty()) && ui->drawRadioButton->isChecked())
     {
         //QMessageBox::about(this,"test output", QString::number(ui->paintWidjet->Pixels[1]));//здесь нужно вызвать функцию распознавания
-        ui->prediction->setText("This is A");
+        ui->prediction->setText("U");
         ui->paintWidjet->Pixels_draw.clear();
     }
 
-    if (!(ui->paintWidjet->Pixels_file.empty()) && ui->radioButton_2->isChecked())
+    else if (!(ui->paintWidjet->Pixels_file.empty()) && ui->bmpRadioButton->isChecked())
     {
         //QMessageBox::about(this,"test output", QString::number(ui->paintWidjet->Pixels[1]));//здесь нужно вызвать функцию распознавания
-        ui->prediction->setText("This is B");
+        ui->prediction->setText("G");
         ui->paintWidjet->Pixels_file.clear();
     }
 }
@@ -25,11 +26,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     this->setWindowIcon(QIcon(":/images/Perceptron-or-task.png"));
     this->setWindowTitle("MLP");
-    ui->pushButton_2->setEnabled(false);
-    connect(ui->pushButton, SIGNAL (clicked()), this, SLOT (handleButton()));
-    connect(ui->pushButton_2, SIGNAL (clicked()), this, SLOT (bmp_file_dialog()));
-    connect(ui->radioButton, SIGNAL (clicked()), this, SLOT (selectDrawMode()));
-    connect(ui->radioButton_2, SIGNAL (clicked()), this, SLOT (selectFileMode()));
+    ui->browseButton->setEnabled(false);
+
+    connect(ui->recognizeButton, SIGNAL (clicked()), this, SLOT (Recognize()));
+    connect(ui->drawRadioButton, SIGNAL (clicked()), this, SLOT (selectDrawMode()));
+    connect(ui->bmpRadioButton, SIGNAL (clicked()), this, SLOT (selectFileMode()));
+    connect(ui->browseButton, SIGNAL (clicked()), this, SLOT (bmp_file_dialog()));
+
     //connect(ui->radioButton_3, SIGNAL (clicked()), this, SLOT (selectFileMode()));
     //connect(ui->horizontalSlider, SIGNAL (sliderMoved(int)), this, SLOT(changeValueOfSlider()));
     connect(ui->horizontalSlider_2, SIGNAL (valueChanged(int)), this, SLOT(changeValueOfSlider2()));
@@ -126,13 +129,13 @@ void MainWindow::bmp_file_dialog() {
 void MainWindow::selectDrawMode()
 {
     ui->paintWidjet->setEnabled(true);
-    ui->pushButton_2->setEnabled(false);
+    ui->browseButton->setEnabled(false);
 }
 
 void MainWindow::selectFileMode()
 {
     ui->paintWidjet->setEnabled(false);
-    ui->pushButton_2->setEnabled(true);
+    ui->browseButton->setEnabled(true);
 }
 
 MainWindow::~MainWindow()

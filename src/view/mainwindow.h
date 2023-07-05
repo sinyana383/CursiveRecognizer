@@ -26,7 +26,7 @@ public:
     bool is_matrix;
     bool IsClickedCommandButton;
 public Q_SLOTS:
-    void handleButton();
+    void Recognize();
     void bmp_file_dialog();
     void selectDrawMode();
     void selectFileMode();
